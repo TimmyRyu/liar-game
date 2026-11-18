@@ -59,6 +59,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible,.card:focus-visib
 .code{width:100%; min-height:68px; border:var(--bw) solid var(--line); border-radius:var(--r-m); background:var(--face); color:var(--ink);
   font-family:var(--f-title); font-size:36px; text-align:center; padding:0; text-transform:uppercase}
 .code::placeholder{color:#8c8577; text-transform:none; font-size:24px}
+#game{letter-spacing:.3em; padding-left:.3em}
 .msg{min-height:28px; font-size:var(--t1); font-weight:600; margin:var(--s1) 0 var(--s1)}
 .msg.err{color:var(--error)} .msg.ok{color:var(--ok)}
 
@@ -108,22 +109,27 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
   <!-- 1. 설정 -->
   <section id="v-setup" hidden>
     <div class="block">
-      <h2 class="step"><i>1</i>내 번호</h2>
+      <h2 class="step"><i>1</i><label for="game">게임 번호</label></h2>
+      <input class="code" id="game" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="0000" autocomplete="off" aria-describedby="check">
+      <p class="msg" id="check" role="status" aria-live="polite"></p>
+    </div>
+    <div class="block">
+      <h2 class="step"><i>2</i>내 번호</h2>
       <div class="grid7" id="nums"></div>
       <p class="note">진행자가 정해 준 조 안의 자리 번호를 고르세요. 같은 조에서 번호가 겹치면 안 됩니다.</p>
     </div>
-    <button class="btn" id="go-setup" disabled>번호를 고르세요</button>
+    <button class="btn" id="go-setup" disabled>게임 번호와 내 번호를 넣으세요</button>
   </section>
 
   <!-- 2. 판·코드 -->
   <section id="v-round" hidden>
-    <div class="me"><span><b id="me-label"></b></span><button class="link" id="change">번호 바꾸기</button></div>
+    <div class="me"><span><b id="me-label"></b></span><button class="link" id="change">다시 설정</button></div>
     <div class="block">
-      <h2 class="step"><i>2</i>몇 번째 판인가요?</h2>
+      <h2 class="step"><i>3</i>몇 번째 판인가요?</h2>
       <div class="grid6" id="rounds"></div>
     </div>
     <form class="block" id="code-form" autocomplete="off" novalidate>
-      <h2 class="step"><i>3</i><label for="code">우리 조 (a 또는 b)</label></h2>
+      <h2 class="step"><i>4</i><label for="code">우리 조 (a 또는 b)</label></h2>
       <input class="code" id="code" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="3" placeholder="a / b" aria-describedby="msg">
       <p class="msg" id="msg" role="status" aria-live="polite"></p>
       <button class="btn" id="open" type="submit">내 카드 받기</button>
@@ -144,7 +150,8 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
   <details>
     <summary>규칙과 점수</summary>
     <ol>
-      <li>진행자가 판 번호와 카테고리를 알려 줍니다.</li>
+      <li>시작할 때 사회자가 게임 번호를 알려 줍니다. 한 번 입력하고 확인 단어가 모두 같은지 맞춰 봅니다.</li>
+      <li>판마다 사회자가 판 번호와 카테고리를 알려 줍니다.</li>
       <li>각자 판 번호와 우리 조(a/b)를 넣고 카드를 확인합니다. 라이어 1명만 제시어를 모릅니다.</li>
       <li>1번부터 한 문장씩 제시어를 설명합니다(2바퀴).</li>
       <li>토론 2분 후, 셋을 세고 동시에 지목합니다.</li>
@@ -161,62 +168,92 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
 </div>
 
 <script>
-const DATA = {"A-1":{"iv":"NBroSJrzM8eVnPei","ct":"qYeJLgjtX2RAewKPY408fyGJejLKtNP4X9t5h2kc0IKOyO5sNLtgChbuFfdUHn6gY92wbw=="},"A-2":{"iv":"LK82SEu245BVTIYC","ct":"2tVcgmZDQ+1joDhnsD2RenMBP2X8pJrfSuJ35stl5Ubn7jRB5KXrDjoNTA5nLna58Z9wYQ=="},"A-3":{"iv":"Ow0MHbMJnNX/l0P1","ct":"qw6mbQbi8GMVRGybBvwQFecyu50QEiAPWqVBXF4DeY+t7tFAQbnvrLL0KkmfFqDTEWXMqN5F0A=="},"A-4":{"iv":"p699Gkf66F3GKQU3","ct":"jCkbQxHDiwjoTkuQPgFl6hUFQDZc79qeKjeI/88VLlQqyXG4ZPZVk8e1I6Z+9dHqpQ=="},"A-5":{"iv":"UosjBVbXFFFqzy7J","ct":"Pyb3zd/kH5ay9LcSI3V4LVnK/klat82NhlAgYxD5J6FBVmq2AywGMnqahVNx6gMCfx48/Q=="},"A-6":{"iv":"gpM8b+6HiqLZfu5t","ct":"drSQJdfZn2AKRf8dFMCzQbyG4o4lhisyHOVYaHdmcn5x4r0VzWoWbjxjL74WAu8mOQ=="},"B-1":{"iv":"9tUOcS1vxDHQrvuK","ct":"w0ix+/8jUPNcwLxedRA0A3a1GScqm3Ud59bm5hhW0DkI14OXPxDguYUxYOGbLJnXmkq39g=="},"B-2":{"iv":"1Mjie9uqjcgi/mAC","ct":"AU4HSovPxwU1fAqhzDsdNSjhdmueMSh9rEk4ZsJ3iS6u3Jsv9Jz2Pcw3BgVXB8ZEdw=="},"B-3":{"iv":"mGoHFlocfI9YQZ0a","ct":"dPnZY2nqCk4v3UfO12UKhgpmGv/g+55qeewjrcBPws4YZt4ia4N9YoF6jNQ2RrYjdY8OwTe5tw=="},"B-4":{"iv":"m2bw8I6FIgz2mfz8","ct":"/Ib1ewjgpwFQmAitJ2/Oc6dO8v2Exq6sp9hZdD6zvLeFIABsA0ideudJqStKEOaQqqNC/A=="},"B-5":{"iv":"j2dCTHJ78QuE6M67","ct":"AOujLNvcOKNQUxeUEj0qFB+PAig6AvS18i7TMIBXNkjjrAJ2Pcfnk/69eTG1YiWrW9uDdZeWlQ=="},"B-6":{"iv":"+L4h+mkfcuYV5sip","ct":"ypH1RyI4XCwah0+1+ptSK4l7S//YjxcrPCgcSuCiu1F77AKOAPlvJdYiJ7ow/pdiRvndCg=="}};
-const ITER = 120000;
-const PASS = 'workshop-liar-2026';
+/* 게임 번호(4자리)를 재료로 라이어 순서와 제시어를 정함. 같은 번호 = 어느 폰에서나 같은 결과. */
+const POOLS = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('eyLsnYzsi50iOiBbIuuWoeuztuydtCIsICLsgrzqsrnsgrQiLCAi6rmA67ClIiwgIuynnOyepeuptCIsICLrnbzrqbQiLCAi7LmY7YKoIiwgIuu5hOu5lOuwpSIsICLtlLzsnpAiLCAi64OJ66m0IiwgIuyInOuMgCIsICLstIjrsKUiLCAi7ZaE67KE6rGwIiwgIuq5gOy5mOywjOqwnCIsICLrtpXslrTrubUiLCAi66eI65287YOVIl0sICLsnqXshowiOiBbIuywnOyniOuwqSIsICLqs7Xtla0iLCAi7Y647J2Y7KCQIiwgIuuPhOyEnOq0gCIsICLrhbjrnpjrsKkiLCAi67OR7JuQIiwgIuuGgOydtOqzteybkCIsICLsuqDtlZHsnqUiLCAi7KeA7ZWY7LKg7JetIiwgIuyYge2ZlOq0gCIsICLtl6zsiqTsnqUiLCAi7J2A7ZaJIiwgIuyImOyYgeyepSIsICLrr7jsmqnsi6QiLCAi6rKw7Zi87Iud7J6lIl0sICLsp4HsnqXsg53tmZwiOiBbIu2ajOyLnSIsICLsl7DssKgiLCAi7JW86re8IiwgIuy2nOyepSIsICLsm5TquInrgqAiLCAi7ZqM7J2YIiwgIuuztOqzoOyEnCIsICLsm4ztgazsiI0iLCAi7Iug7J6F7IKs7JuQIiwgIuyKueynhCIsICLth7Tqt7wiLCAi7YOV67mE7IukIiwgIuuqheygiCDshKDrrLwiLCAi7J6s7YOd6re866y0IiwgIuygkOyLrOyLnOqwhCJdLCAi66y86rG0IjogWyLsmrDsgrAiLCAi7J207Ja07Y+wIiwgIuqxsOyauCIsICLsuavshpQiLCAi66as66qo7LuoIiwgIuyViOqyvSIsICLthYDruJTrn6wiLCAi67O07KGw67Cw7YSw66asIiwgIuuLrOugpSIsICLqsIDsnIQiLCAi67Kg6rCcIiwgIuyngOqwkSIsICLshpDthrHquY7snbQiLCAi7Je07IegIiwgIuyEoO2Sjeq4sCJdLCAi7KeB7JeFIjogWyLshozrsKnqtIAiLCAi67CU66as7Iqk7YOAIiwgIu2DneuwsOq4sOyCrCIsICLsnZjsgqwiLCAi7ISg7IOd64uYIiwgIuyalOumrOyCrCIsICLqsr3ssLDqtIAiLCAi7Jyg7Yqc67KEIiwgIuuvuOyaqeyCrCIsICLsobDsooXsgqwiLCAi6riw7J6QIiwgIuyVveyCrCIsICLrho3rtoAiLCAi6rCA7IiYIiwgIuyatOuPmeyEoOyImCJdfQ=='), c => c.charCodeAt(0))));
+const CATS = ['음식','장소','직장생활','물건','직업','음식']; // 1~5판 + 6 예비
+const COLORS = ['빨간','파란','노란','초록','하얀','까만','보라','주황','분홍','회색'];
+const ANIMALS = ['기린','펭귄','수달','판다','고래','다람쥐','코알라','하마','여우','부엉이','너구리','고슴도치','알파카','낙타','거북이','사자','토끼','돌고래','앵무새','문어'];
+function cyrb128(str){let h1=1779033703,h2=3144134277,h3=1013904242,h4=2773480762;
+  for(let i=0,k;i<str.length;i++){k=str.charCodeAt(i);h1=h2^Math.imul(h1^k,597399067);h2=h3^Math.imul(h2^k,2869860233);h3=h4^Math.imul(h3^k,951274213);h4=h1^Math.imul(h4^k,2716044179)}
+  h1=Math.imul(h3^(h1>>>18),597399067);h2=Math.imul(h4^(h2>>>22),2869860233);h3=Math.imul(h1^(h3>>>17),951274213);h4=Math.imul(h2^(h4>>>19),2716044179);
+  h1^=(h2^h3^h4);h2^=h1;h3^=h1;h4^=h1;return [h1>>>0,h2>>>0,h3>>>0,h4>>>0]}
+function sfc32(a,b,c,d){return function(){a|=0;b|=0;c|=0;d|=0;const t=(a+b|0)+d|0;d=d+1|0;a=b^b>>>9;b=c+(c<<3)|0;c=c<<21|c>>>11;c=c+t|0;return (t>>>0)/4294967296}}
+async function rng(key){const h=new Uint32Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(key)));const r=sfc32(h[0],h[1],h[2],h[3]);for(let i=0;i<16;i++)r();return r}
+function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+async function deal(game){
+  const lists={}, used={}, words={A:[],B:[]};
+  for(const c of Object.keys(POOLS)){lists[c]=shuffle(POOLS[c],await rng('words|'+c+'|'+game));used[c]=0}
+  CATS.forEach(c=>{words.A.push(lists[c][used[c]]);words.B.push(lists[c][used[c]+1]);used[c]+=2});
+  const liars={A:shuffle([1,2,3,4,5,6,7],await rng('liar|'+game+'|A')).slice(0,6), B:shuffle([1,2,3,4,5,6,7],await rng('liar|'+game+'|B')).slice(0,6)};
+  return {words,liars};
+}
+async function card(game,group,round,num){const d=await deal(game),l=d.liars[group][round-1];return {cat:CATS[round-1],liar:l===num,word:l===num?null:d.words[group][round-1]}}
+async function checkWord(game){const r=await rng('check|'+game);return COLORS[Math.floor(r()*COLORS.length)]+' '+ANIMALS[Math.floor(r()*ANIMALS.length)]}
+window.LG={deal,card,checkWord,CATS,POOLS};
+
 const $ = id => document.getElementById(id);
 const store = {
   get(k){try{return localStorage.getItem(k)}catch(e){return null}},
-  set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
 };
-const st = {group:store.get('lg_group'), confirmGroup:null, num:Number(store.get('lg_num'))||null, round:Number(store.get('lg_round'))||null, card:null};
-
-function b64(s){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
-async function decrypt(group, round, code){
-  const rec = DATA[group+'-'+round]; if(!rec) throw new Error('nodata');
-  const enc = new TextEncoder();
-  const base = await crypto.subtle.importKey('raw', enc.encode(code), 'PBKDF2', false, ['deriveKey']);
-  const key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:enc.encode('liar|'+group+'|'+round), iterations:ITER, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
-  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(rec.iv)}, key, b64(rec.ct));
-  return JSON.parse(new TextDecoder().decode(pt));
-}
+const validGame = g => /^\d{4}$/.test(g||'');
+const st = {game:store.get('lg_game'), group:store.get('lg_group'), confirmGroup:null, num:Number(store.get('lg_num'))||null, round:Number(store.get('lg_round'))||null, card:null};
+if(!validGame(st.game)) st.game=null;
 
 function show(v){['v-setup','v-round','v-reveal'].forEach(x=>$(x).hidden = x!==v); window.scrollTo(0,0)}
 function meText(){return (st.group?st.group+'조 ':'')+st.num+'번'}
 function parseGroup(v){
-  const t=v.replace(/[\uFF21-\uFF3A\uFF41-\uFF5A]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).toLowerCase().replace(/[\s조그룹팀]/g,'');
+  const t=v.replace(/[Ａ-Ｚａ-ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).toLowerCase().replace(/[\s조그룹팀]/g,'');
   if(t==='a'||t==='ㅁ') return 'A';
   if(t==='b'||t==='ㅠ') return 'B';
   return null;
 }
 function roundText(r){return r===6?'예비 판':r+'판'}
+let draftGame = st.game || '';
 
 function buildSetup(){
+  $('game').value = draftGame;
+  const g=draftGame, ok1=validGame(g);
+  const c=$('check');
+  if(ok1){c.className='msg ok';c.textContent='확인 단어 계산 중...';checkWord(g).then(w=>{if(draftGame===g)c.textContent='확인 단어: '+w+' · 사회자와 같은지 확인하세요'})}
+  else if(g.length){c.className='msg';c.textContent='4자리를 모두 넣으세요'}
+  else {c.className='msg';c.textContent=''}
   const n=$('nums'); n.innerHTML='';
   for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='chip';b.textContent=i;b.setAttribute('aria-pressed',st.num===i);b.setAttribute('aria-label',i+'번');b.onclick=()=>{st.num=i;buildSetup()};n.appendChild(b)}
-  const ok = !!st.num;
+  const ok = ok1 && !!st.num;
   $('go-setup').disabled = !ok;
-  $('go-setup').textContent = ok ? meText()+'으로 입장' : '번호를 고르세요';
+  $('go-setup').textContent = ok ? '게임 '+g+' · '+st.num+'번으로 입장' : (!ok1 ? '게임 번호 4자리를 넣으세요' : '내 번호를 고르세요');
 }
+$('game').addEventListener('input',e=>{
+  draftGame=e.target.value.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\D/g,'').slice(0,4);
+  buildSetup();
+  if(validGame(draftGame)) e.target.blur();
+});
 function buildRounds(){
   const r=$('rounds'); r.innerHTML='';
   for(let i=1;i<=6;i++){const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed',st.round===i);b.innerHTML=i===6?'예비<small>6번째</small>':i+'판';b.setAttribute('aria-label',roundText(i));b.onclick=()=>{st.round=i;store.set('lg_round',String(i));buildRounds();setMsg('','');$('code').focus()};r.appendChild(b)}
 }
 function setMsg(t,c){const m=$('msg');m.textContent=t;m.className='msg'+(c?' '+c:'')}
 function toRound(){
-  $('me-label').textContent=meText(); $('code').value=''; setMsg('','');
+  $('me-label').textContent='게임 '+st.game+' · '+meText(); $('code').value=''; setMsg('','');
   buildRounds(); show('v-round');
 }
 
-$('go-setup').onclick=()=>{store.set('lg_num',String(st.num));toRound()};
-$('change').onclick=()=>{buildSetup();show('v-setup')};
+$('go-setup').onclick=()=>{
+  if(st.game!==draftGame){ // 새 게임이면 조·판 기록 초기화
+    st.game=draftGame; store.set('lg_game',st.game);
+    st.group=null; store.del('lg_group'); st.round=null; store.del('lg_round');
+  }
+  store.set('lg_num',String(st.num)); toRound();
+};
+$('change').onclick=()=>{draftGame=st.game||'';buildSetup();show('v-setup')};
 $('code').addEventListener('input',e=>{
   st.confirmGroup=null;
   if(parseGroup(e.target.value) && st.round) $('code-form').requestSubmit();
 });
-let busy=false;
 $('code-form').addEventListener('submit',async e=>{
-  e.preventDefault(); if(busy) return;
+  e.preventDefault();
   const g=parseGroup($('code').value);
   if(!st.round){setMsg('판 번호를 먼저 고르세요.','err');return}
   if(!g){setMsg('우리 조를 a 또는 b로 입력하세요.','err');return}
@@ -225,17 +262,11 @@ $('code-form').addEventListener('submit',async e=>{
     setMsg('지난 판에는 '+st.group+'조였어요. '+g+'조가 맞으면 아래 버튼을 한 번 더 누르세요.','err');
     return;
   }
-  busy=true; $('open').disabled=true; setMsg('카드 섞는 중...','');
-  try{
-    const d=await decrypt(g, st.round, PASS);
-    st.group=g; st.confirmGroup=null; store.set('lg_group',g);
-    st.card={cat:d.c, liar:d.l===st.num, word:d.l===st.num?null:d.w};
-    $('me-label2').textContent=meText();
-    $('round-label').textContent=roundText(st.round);
-    renderCard(); hide(); show('v-reveal');
-  }catch(err){
-    setMsg('카드를 불러오지 못했어요. 새로고침 후 다시 시도하세요.','err');
-  }finally{busy=false; $('open').disabled=false}
+  st.card=await card(st.game,g,st.round,st.num);
+  st.group=g; st.confirmGroup=null; store.set('lg_group',g);
+  $('me-label2').textContent=meText();
+  $('round-label').textContent=roundText(st.round);
+  renderCard(); hide(); show('v-reveal');
 });
 
 function renderCard(){
@@ -246,16 +277,16 @@ function renderCard(){
   if(c.liar){w.textContent='당신은 라이어';const s=document.createElement('div');s.className='sub2';s.textContent='제시어를 아는 척하며 들키지 말고, 다른 사람 설명으로 제시어를 알아내세요.';f.appendChild(s)}
   else{w.textContent=c.word}
 }
-const card=$('card');
-function reveal(){if(!st.card)return;card.classList.add('show');card.classList.toggle('liar',!!st.card.liar);$('card-back').hidden=true;$('card-front').hidden=false}
-function hide(){card.classList.remove('show','liar');$('card-back').hidden=false;$('card-front').hidden=true}
-card.addEventListener('pointerdown',e=>{e.preventDefault();try{card.setPointerCapture(e.pointerId)}catch(_){};reveal()});
-['pointerup','pointercancel','lostpointercapture'].forEach(t=>card.addEventListener(t,hide));
-card.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-card.addEventListener('contextmenu',e=>e.preventDefault());
-card.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();reveal()}});
-card.addEventListener('keyup',hide);
-card.addEventListener('blur',hide);
+const cardEl=$('card');
+function reveal(){if(!st.card)return;cardEl.classList.add('show');cardEl.classList.toggle('liar',!!st.card.liar);$('card-back').hidden=true;$('card-front').hidden=false}
+function hide(){cardEl.classList.remove('show','liar');$('card-back').hidden=false;$('card-front').hidden=true}
+cardEl.addEventListener('pointerdown',e=>{e.preventDefault();try{cardEl.setPointerCapture(e.pointerId)}catch(_){};reveal()});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>cardEl.addEventListener(t,hide));
+cardEl.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+cardEl.addEventListener('contextmenu',e=>e.preventDefault());
+cardEl.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();reveal()}});
+cardEl.addEventListener('keyup',hide);
+cardEl.addEventListener('blur',hide);
 document.addEventListener('visibilitychange',hide);
 $('next').onclick=()=>{
   st.card=null; hide();
@@ -263,7 +294,7 @@ $('next').onclick=()=>{
   toRound();
 };
 
-if(st.num){toRound()} else {buildSetup();show('v-setup')}
+if(st.game && st.num){toRound()} else {buildSetup();show('v-setup')}
 </script>
 </body>
 </html>
