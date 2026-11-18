@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>라이어 게임</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+/* 토큰: 보드게임 카드 (둥근 고딕 · 고채도 대비 · 모듈 블록 · 큰 반경) */
+:root{
+  --bg:#fff6dc; --bg-2:#ffe08a; --ink:#1c1a17; --ink-2:#4d4637; --line:#1c1a17;
+  --green:#17734b; --yellow:#ffc93c; --face:#fffdf6;
+  --focus:#1c1a17; --error:#b3261e; --ok:#17734b;
+  --f-title:'Jua','Pretendard Variable',sans-serif;
+  --f-body:'Pretendard Variable',Pretendard,system-ui,sans-serif;
+  --t1:15px; --t2:17px; --t3:22px; --t4:28px; --t5:clamp(40px,12vw,56px);
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --s5:48px;
+  --r-l:28px; --r-m:20px; --r-s:14px; --bw:3px; --lift:0 5px 0 var(--ink);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:var(--t2); line-height:1.65;
+  word-break:keep-all; overflow-wrap:anywhere; -webkit-tap-highlight-color:transparent}
+.wrap{max-width:440px; margin:0 auto; padding:var(--s2) var(--s2) var(--s5)}
+
+.top{background:var(--bg-2); border:var(--bw) solid var(--line); border-radius:var(--r-l); box-shadow:var(--lift);
+  padding:var(--s3) var(--s3) var(--s2); margin-bottom:var(--s4); position:relative}
+.top h1{font-family:var(--f-title); font-weight:400; font-size:var(--t5); line-height:1.05; margin:0; letter-spacing:-0.01em}
+.top p{margin:var(--s1) 0 0; font-size:var(--t1); color:var(--ink-2)}
+.sticker{position:absolute; right:14px; top:-14px; transform:rotate(3deg); background:var(--green); color:var(--bg);
+  border:var(--bw) solid var(--line); border-radius:var(--r-s); font-family:var(--f-title); font-size:var(--t1); padding:4px 12px}
+
+.step{display:flex; align-items:baseline; gap:var(--s1); font-family:var(--f-title); font-size:var(--t3); margin:0 0 var(--s1)}
+.step i{font-style:normal; display:inline-grid; place-items:center; width:30px; height:30px; border-radius:50%;
+  background:var(--ink); color:var(--bg); font-size:var(--t1); flex:none; transform:translateY(-2px)}
+.block{margin-bottom:var(--s4)}
+.note{font-size:var(--t1); color:var(--ink-2); margin:var(--s1) 0 0}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:var(--s1)}
+.grid7{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s1)}
+.grid6{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s1)}
+.chip{min-height:56px; border:var(--bw) solid var(--line); border-radius:var(--r-s); background:var(--face); color:var(--ink);
+  font-family:var(--f-title); font-size:var(--t3); cursor:pointer; padding:0; line-height:1.1}
+.chip small{display:block; font-family:var(--f-body); font-size:13px; font-weight:600}
+.chip[aria-pressed="true"]{background:var(--green); color:var(--bg)}
+.chip.big{min-height:72px; font-size:var(--t4)}
+
+.btn{width:100%; min-height:60px; border:var(--bw) solid var(--line); border-radius:var(--r-m); background:var(--ink); color:var(--bg);
+  font-family:var(--f-title); font-size:var(--t3); cursor:pointer; box-shadow:0 5px 0 var(--green)}
+.btn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--green)}
+.btn:disabled{background:#8c8577; border-color:#8c8577; box-shadow:none; cursor:not-allowed}
+.btn.sub{background:var(--face); color:var(--ink); box-shadow:var(--lift); font-size:var(--t2); min-height:52px}
+button:focus-visible,input:focus-visible,summary:focus-visible,.card:focus-visible{outline:3px solid var(--focus); outline-offset:4px}
+
+.code{width:100%; min-height:68px; border:var(--bw) solid var(--line); border-radius:var(--r-m); background:var(--face); color:var(--ink);
+  font-family:var(--f-title); font-size:36px; letter-spacing:.35em; text-align:center; padding:0 0 0 .35em}
+.msg{min-height:28px; font-size:var(--t1); font-weight:600; margin:var(--s1) 0 var(--s1)}
+.msg.err{color:var(--error)} .msg.ok{color:var(--ok)}
+
+.me{display:flex; justify-content:space-between; align-items:center; gap:var(--s1); background:var(--face);
+  border:var(--bw) solid var(--line); border-radius:var(--r-m); padding:6px 6px 6px var(--s2); margin-bottom:var(--s3)}
+.me b{font-family:var(--f-title); font-weight:400; font-size:var(--t3)}
+.link{background:var(--bg-2); border:2px solid var(--line); border-radius:var(--r-s); color:var(--ink); font:inherit; font-size:var(--t1);
+  font-weight:600; cursor:pointer; min-height:44px; padding:0 14px}
+
+.card{width:100%; min-height:300px; border:var(--bw) solid var(--line); border-radius:var(--r-l); box-shadow:var(--lift);
+  background:var(--green); color:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:var(--s3); user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; touch-action:none; cursor:pointer; position:relative}
+.card::before{content:""; position:absolute; inset:12px; border:2px dashed var(--bg); border-radius:18px; pointer-events:none}
+.card .hint{font-family:var(--f-title); font-size:var(--t4); line-height:1.2}
+.card .sub{font-size:var(--t1); margin-top:var(--s1)}
+.card.show{background:var(--face); color:var(--ink)}
+.card.show::before{border-color:var(--ink-2)}
+.card.show.liar{background:var(--ink); color:var(--yellow)}
+.card.show.liar::before{border-color:var(--yellow)}
+.tag{font-family:var(--f-title); font-size:var(--t2); background:var(--bg-2); color:var(--ink); border:2px solid var(--line);
+  border-radius:var(--r-s); padding:2px 12px; margin-bottom:var(--s2); width:max-content; max-width:100%}
+.word{font-family:var(--f-title); font-size:var(--t5); line-height:1.15}
+.liar .sub2{font-size:var(--t1); margin-top:var(--s2); line-height:1.6; color:var(--bg)}
+
+details{margin-top:var(--s5); background:var(--face); border:var(--bw) solid var(--line); border-radius:var(--r-m); padding:var(--s1) var(--s2)}
+summary{font-family:var(--f-title); font-size:var(--t3); cursor:pointer; min-height:44px; display:flex; align-items:center; justify-content:space-between; list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"열기"; font-family:var(--f-body); font-size:var(--t1); font-weight:600}
+details[open] summary::after{content:"닫기"}
+table{width:100%; border-collapse:separate; border-spacing:0; font-size:var(--t1); margin:var(--s1) 0 var(--s2); border:2px solid var(--line); border-radius:var(--r-s); overflow:hidden}
+th,td{padding:8px 10px; text-align:left; vertical-align:top; border-bottom:2px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{background:var(--bg-2)}
+ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(--t1)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="sticker">1명은 거짓말 중</span>
+    <h1>라이어 게임</h1>
+    <p>워크숍 에디션 · 7명씩 2그룹</p>
+  </div>
+
+  <!-- 1. 설정 -->
+  <section id="v-setup" hidden>
+    <div class="block">
+      <h2 class="step"><i>1</i>내 그룹</h2>
+      <div class="grid2" id="groups"></div>
+    </div>
+    <div class="block">
+      <h2 class="step"><i>2</i>내 번호</h2>
+      <div class="grid7" id="nums"></div>
+      <p class="note">진행자가 정해 준 자리 번호를 고르세요. 같은 그룹에서 번호가 겹치면 안 됩니다.</p>
+    </div>
+    <button class="btn" id="go-setup" disabled>그룹과 번호를 고르세요</button>
+  </section>
+
+  <!-- 2. 판·코드 -->
+  <section id="v-round" hidden>
+    <div class="me"><span><b id="me-label"></b></span><button class="link" id="change">번호 바꾸기</button></div>
+    <div class="block">
+      <h2 class="step"><i>3</i>몇 번째 판인가요?</h2>
+      <div class="grid6" id="rounds"></div>
+    </div>
+    <form class="block" id="code-form" autocomplete="off" novalidate>
+      <h2 class="step"><i>4</i><label for="code">진행자가 불러 준 코드</label></h2>
+      <input class="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-describedby="msg">
+      <p class="msg" id="msg" role="status" aria-live="polite"></p>
+      <button class="btn" id="open" type="submit">내 카드 받기</button>
+    </form>
+  </section>
+
+  <!-- 3. 카드 -->
+  <section id="v-reveal" hidden>
+    <div class="me"><span><b id="me-label2"></b></span><span id="round-label" style="font-weight:600;padding-right:10px"></span></div>
+    <div class="card" id="card" role="button" tabindex="0" aria-label="누르고 있는 동안 내 카드가 보입니다">
+      <div id="card-back"><div class="hint">꾹 누르고 있기</div><div class="sub">누르는 동안만 보여요. 화면을 가리고 확인하세요.</div></div>
+      <div id="card-front" hidden></div>
+    </div>
+    <p class="note" style="margin:var(--s3) 0">확인했으면 손을 떼세요. 판이 끝나면 아래 버튼을 누릅니다.</p>
+    <button class="btn sub" id="next">다음 판으로</button>
+  </section>
+
+  <details>
+    <summary>규칙과 점수</summary>
+    <ol>
+      <li>진행자가 판 번호, 카테고리, 코드를 불러 줍니다.</li>
+      <li>각자 카드를 확인합니다. 라이어 1명만 제시어를 모릅니다.</li>
+      <li>1번부터 한 문장씩 제시어를 설명합니다(2바퀴).</li>
+      <li>토론 2분 후, 셋을 세고 동시에 지목합니다.</li>
+      <li>지목된 사람이 라이어면 제시어를 1번 맞힐 기회를 줍니다.</li>
+    </ol>
+    <table>
+      <tr><th>결과</th><th>점수</th></tr>
+      <tr><td>라이어 검거 + 제시어 못 맞힘</td><td>시민 각 +1</td></tr>
+      <tr><td>라이어가 지목되지 않음</td><td>라이어 +3</td></tr>
+      <tr><td>라이어 검거 + 제시어 맞힘</td><td>라이어 +2</td></tr>
+    </table>
+    <p class="note">동표면 동표자끼리 1번 재투표, 또 동표면 라이어 탈출. 정답은 정확한 단어나 진행자가 인정한 동의어. 한 번 라이어가 된 사람은 다시 라이어가 되지 않습니다.</p>
+  </details>
+</div>
+
+<script>
+const DATA = {"A-1":{"iv":"2+ecr4lcsYCPObU8","ct":"oVSrLjtg8QHiUy/1QlcaD2Mo+lLI+36SENPZS+HY2RxyM9sC/GLBydUUDv+VlHMfaoBZOQ=="},"A-2":{"iv":"NBF4KWKCF0qGbyZr","ct":"sFcTXItzJjLD+30iQrDADJuZdMFBnUYe8O07AvjXR7LYCleVFSh+IoGSq+gLIiCSifDY5Q=="},"A-3":{"iv":"y07QKAWM1iCFAlHI","ct":"YHCdak+a0e+wcJUX9PccCZenJQEhA7r5p9waBeky9f9aryrrVQdNi5nbjzlyYJ5VA0scgbZMGA=="},"A-4":{"iv":"F9YE4LjgCwXEaFYX","ct":"8SXxxvS68kH22XK9Th9FiI6aFPXXj4lCTMu+T9IFXjp/0H3jXAKluKLi2cTMVfl9Qg=="},"A-5":{"iv":"sKJ0PEXodmcj5W8a","ct":"qBDyczJsiSSML1RjSA4RbcBdjTRBBX2FmMEQWYvCvWxnYGZ5BdrdfHog4z3nALxZ4d7Dog=="},"A-6":{"iv":"GJSqLEsThIqprUwc","ct":"35qfvtjrPXVnRA4vmtKWG/ZF7MnQCK1M0edn7XUO4gpHHQhJYopTdrn56ovSym5L1Q=="},"B-1":{"iv":"haryXPbny4U4oUug","ct":"1JOY8ARz7dG+g0y/07zpb5Fv0Jz4HD44SgfEBwtRbq9pk/DgRcCsuclnA8kaxCAn+eOFDA=="},"B-2":{"iv":"FDYKMtjE7pgeWAPu","ct":"OJSV8tLL9oHRF/YLeFZk2Xp9703dlXF/jrMpxFtkh2jGUXgbKHMzTHZv4qgXJItV+g=="},"B-3":{"iv":"ZocStT6fWI0Jui8b","ct":"dcp8iOgOP7JMqHkxkts9bIcEeQsCXlSOQhtbV+IDfmX9vFszTqjs2uzuRNESOBjDs8QQ5RJKeA=="},"B-4":{"iv":"zBa7g4WZX7uEkIFS","ct":"tDOjZTEnOQEfmQHc1Ql/6SGnRsu9cMZH6hZOR99FuM7d1nzbiaE94UexTkabkCjQ94cIeg=="},"B-5":{"iv":"Cluc32/QNgrQojLJ","ct":"zINEFaZIRYjis5HFrQmbzq3gSw40g/CzqQqS4czwz0jeI+bJedLw0H4WRWMqjt95RbAIfPA6TA=="},"B-6":{"iv":"TiAqxRcCZosBlJ/Q","ct":"rBGOL5G+IpHxOkKRNyZ3UZ0XO07XahnTUKAQI14WOH/ViBqBy9vgYfC2mMFrAXgQucMcZQ=="}};
+const ITER = 120000;
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+};
+const st = {group:store.get('lg_group'), num:Number(store.get('lg_num'))||null, round:Number(store.get('lg_round'))||null, card:null};
+
+function b64(s){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+async function decrypt(group, round, code){
+  const rec = DATA[group+'-'+round]; if(!rec) throw new Error('nodata');
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey('raw', enc.encode(code), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:enc.encode('liar|'+group+'|'+round), iterations:ITER, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(rec.iv)}, key, b64(rec.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+function show(v){['v-setup','v-round','v-reveal'].forEach(x=>$(x).hidden = x!==v); window.scrollTo(0,0)}
+function meText(){return st.group+'그룹 '+st.num+'번'}
+function roundText(r){return r===6?'예비 판':r+'판'}
+
+function buildSetup(){
+  const g=$('groups'); g.innerHTML='';
+  ['A','B'].forEach(x=>{const b=document.createElement('button');b.className='chip big';b.textContent=x+'그룹';b.setAttribute('aria-pressed',st.group===x);b.onclick=()=>{st.group=x;buildSetup()};g.appendChild(b)});
+  const n=$('nums'); n.innerHTML='';
+  for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='chip';b.textContent=i;b.setAttribute('aria-pressed',st.num===i);b.setAttribute('aria-label',i+'번');b.onclick=()=>{st.num=i;buildSetup()};n.appendChild(b)}
+  const ok = !!(st.group && st.num);
+  $('go-setup').disabled = !ok;
+  $('go-setup').textContent = ok ? meText()+'으로 입장' : (st.group ? '번호를 고르세요' : (st.num ? '그룹을 고르세요' : '그룹과 번호를 고르세요'));
+}
+function buildRounds(){
+  const r=$('rounds'); r.innerHTML='';
+  for(let i=1;i<=6;i++){const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed',st.round===i);b.innerHTML=i===6?'예비<small>6번째</small>':i+'판';b.setAttribute('aria-label',roundText(i));b.onclick=()=>{st.round=i;store.set('lg_round',String(i));buildRounds();setMsg('','');$('code').focus()};r.appendChild(b)}
+}
+function setMsg(t,c){const m=$('msg');m.textContent=t;m.className='msg'+(c?' '+c:'')}
+function toRound(){
+  $('me-label').textContent=meText(); $('code').value=''; setMsg('','');
+  buildRounds(); show('v-round');
+}
+
+$('go-setup').onclick=()=>{store.set('lg_group',st.group);store.set('lg_num',String(st.num));toRound()};
+$('change').onclick=()=>{buildSetup();show('v-setup')};
+$('code').addEventListener('input',e=>{
+  e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);
+  if(e.target.value.length===4 && st.round) $('code-form').requestSubmit();
+});
+let busy=false;
+$('code-form').addEventListener('submit',async e=>{
+  e.preventDefault(); if(busy) return;
+  const code=$('code').value;
+  if(!st.round){setMsg('판 번호를 먼저 고르세요.','err');return}
+  if(code.length!==4){setMsg('코드 4자리를 입력하세요.','err');return}
+  busy=true; $('open').disabled=true; setMsg('카드 섞는 중...','');
+  try{
+    const d=await decrypt(st.group, st.round, code);
+    st.card={cat:d.c, liar:d.l===st.num, word:d.l===st.num?null:d.w};
+    $('me-label2').textContent=meText();
+    $('round-label').textContent=roundText(st.round);
+    renderCard(); hide(); show('v-reveal');
+  }catch(err){
+    setMsg('코드가 맞지 않아요. '+st.group+'그룹 · '+roundText(st.round)+' 코드가 맞는지 확인하세요.','err');
+    $('code').select();
+  }finally{busy=false; $('open').disabled=false}
+});
+
+function renderCard(){
+  const c=st.card, f=$('card-front'); f.innerHTML='';
+  const tag=document.createElement('div');tag.className='tag';tag.textContent='카테고리 · '+c.cat;
+  const w=document.createElement('div');w.className='word';
+  f.appendChild(tag); f.appendChild(w);
+  if(c.liar){w.textContent='당신은 라이어';const s=document.createElement('div');s.className='sub2';s.textContent='제시어를 아는 척하며 들키지 말고, 다른 사람 설명으로 제시어를 알아내세요.';f.appendChild(s)}
+  else{w.textContent=c.word}
+}
+const card=$('card');
+function reveal(){if(!st.card)return;card.classList.add('show');card.classList.toggle('liar',!!st.card.liar);$('card-back').hidden=true;$('card-front').hidden=false}
+function hide(){card.classList.remove('show','liar');$('card-back').hidden=false;$('card-front').hidden=true}
+card.addEventListener('pointerdown',e=>{e.preventDefault();try{card.setPointerCapture(e.pointerId)}catch(_){};reveal()});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>card.addEventListener(t,hide));
+card.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+card.addEventListener('contextmenu',e=>e.preventDefault());
+card.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();reveal()}});
+card.addEventListener('keyup',hide);
+card.addEventListener('blur',hide);
+document.addEventListener('visibilitychange',hide);
+$('next').onclick=()=>{
+  st.card=null; hide();
+  if(st.round && st.round<5){st.round+=1; store.set('lg_round',String(st.round))}
+  toRound();
+};
+
+if(st.group && st.num){toRound()} else {buildSetup();show('v-setup')}
+</script>
+</body>
+</html>
