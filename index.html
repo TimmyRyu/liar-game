@@ -57,7 +57,8 @@ body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-siz
 button:focus-visible,input:focus-visible,summary:focus-visible,.card:focus-visible{outline:3px solid var(--focus); outline-offset:4px}
 
 .code{width:100%; min-height:68px; border:var(--bw) solid var(--line); border-radius:var(--r-m); background:var(--face); color:var(--ink);
-  font-family:var(--f-title); font-size:36px; letter-spacing:.35em; text-align:center; padding:0 0 0 .35em}
+  font-family:var(--f-title); font-size:36px; text-align:center; padding:0; text-transform:uppercase}
+.code::placeholder{color:#8c8577; text-transform:none; font-size:24px}
 .msg{min-height:28px; font-size:var(--t1); font-weight:600; margin:var(--s1) 0 var(--s1)}
 .msg.err{color:var(--error)} .msg.ok{color:var(--ok)}
 
@@ -101,33 +102,29 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
   <div class="top">
     <span class="sticker">1명은 거짓말 중</span>
     <h1>라이어 게임</h1>
-    <p>워크숍 에디션 · 7명씩 2그룹</p>
+    <p>워크숍 에디션 · 7명씩 2개 조</p>
   </div>
 
   <!-- 1. 설정 -->
   <section id="v-setup" hidden>
     <div class="block">
-      <h2 class="step"><i>1</i>내 그룹</h2>
-      <div class="grid2" id="groups"></div>
-    </div>
-    <div class="block">
-      <h2 class="step"><i>2</i>내 번호</h2>
+      <h2 class="step"><i>1</i>내 번호</h2>
       <div class="grid7" id="nums"></div>
-      <p class="note">진행자가 정해 준 자리 번호를 고르세요. 같은 그룹에서 번호가 겹치면 안 됩니다.</p>
+      <p class="note">진행자가 정해 준 조 안의 자리 번호를 고르세요. 같은 조에서 번호가 겹치면 안 됩니다.</p>
     </div>
-    <button class="btn" id="go-setup" disabled>그룹과 번호를 고르세요</button>
+    <button class="btn" id="go-setup" disabled>번호를 고르세요</button>
   </section>
 
   <!-- 2. 판·코드 -->
   <section id="v-round" hidden>
     <div class="me"><span><b id="me-label"></b></span><button class="link" id="change">번호 바꾸기</button></div>
     <div class="block">
-      <h2 class="step"><i>3</i>몇 번째 판인가요?</h2>
+      <h2 class="step"><i>2</i>몇 번째 판인가요?</h2>
       <div class="grid6" id="rounds"></div>
     </div>
     <form class="block" id="code-form" autocomplete="off" novalidate>
-      <h2 class="step"><i>4</i><label for="code">진행자가 불러 준 코드</label></h2>
-      <input class="code" id="code" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-describedby="msg">
+      <h2 class="step"><i>3</i><label for="code">우리 조 (a 또는 b)</label></h2>
+      <input class="code" id="code" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="3" placeholder="a / b" aria-describedby="msg">
       <p class="msg" id="msg" role="status" aria-live="polite"></p>
       <button class="btn" id="open" type="submit">내 카드 받기</button>
     </form>
@@ -147,8 +144,8 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
   <details>
     <summary>규칙과 점수</summary>
     <ol>
-      <li>진행자가 판 번호, 카테고리, 코드를 불러 줍니다.</li>
-      <li>각자 카드를 확인합니다. 라이어 1명만 제시어를 모릅니다.</li>
+      <li>진행자가 판 번호와 카테고리를 알려 줍니다.</li>
+      <li>각자 판 번호와 우리 조(a/b)를 넣고 카드를 확인합니다. 라이어 1명만 제시어를 모릅니다.</li>
       <li>1번부터 한 문장씩 제시어를 설명합니다(2바퀴).</li>
       <li>토론 2분 후, 셋을 세고 동시에 지목합니다.</li>
       <li>지목된 사람이 라이어면 제시어를 1번 맞힐 기회를 줍니다.</li>
@@ -164,14 +161,15 @@ ol{padding-left:1.3em; margin:var(--s1) 0} li{margin-bottom:4px; font-size:var(-
 </div>
 
 <script>
-const DATA = {"A-1":{"iv":"2+ecr4lcsYCPObU8","ct":"oVSrLjtg8QHiUy/1QlcaD2Mo+lLI+36SENPZS+HY2RxyM9sC/GLBydUUDv+VlHMfaoBZOQ=="},"A-2":{"iv":"NBF4KWKCF0qGbyZr","ct":"sFcTXItzJjLD+30iQrDADJuZdMFBnUYe8O07AvjXR7LYCleVFSh+IoGSq+gLIiCSifDY5Q=="},"A-3":{"iv":"y07QKAWM1iCFAlHI","ct":"YHCdak+a0e+wcJUX9PccCZenJQEhA7r5p9waBeky9f9aryrrVQdNi5nbjzlyYJ5VA0scgbZMGA=="},"A-4":{"iv":"F9YE4LjgCwXEaFYX","ct":"8SXxxvS68kH22XK9Th9FiI6aFPXXj4lCTMu+T9IFXjp/0H3jXAKluKLi2cTMVfl9Qg=="},"A-5":{"iv":"sKJ0PEXodmcj5W8a","ct":"qBDyczJsiSSML1RjSA4RbcBdjTRBBX2FmMEQWYvCvWxnYGZ5BdrdfHog4z3nALxZ4d7Dog=="},"A-6":{"iv":"GJSqLEsThIqprUwc","ct":"35qfvtjrPXVnRA4vmtKWG/ZF7MnQCK1M0edn7XUO4gpHHQhJYopTdrn56ovSym5L1Q=="},"B-1":{"iv":"haryXPbny4U4oUug","ct":"1JOY8ARz7dG+g0y/07zpb5Fv0Jz4HD44SgfEBwtRbq9pk/DgRcCsuclnA8kaxCAn+eOFDA=="},"B-2":{"iv":"FDYKMtjE7pgeWAPu","ct":"OJSV8tLL9oHRF/YLeFZk2Xp9703dlXF/jrMpxFtkh2jGUXgbKHMzTHZv4qgXJItV+g=="},"B-3":{"iv":"ZocStT6fWI0Jui8b","ct":"dcp8iOgOP7JMqHkxkts9bIcEeQsCXlSOQhtbV+IDfmX9vFszTqjs2uzuRNESOBjDs8QQ5RJKeA=="},"B-4":{"iv":"zBa7g4WZX7uEkIFS","ct":"tDOjZTEnOQEfmQHc1Ql/6SGnRsu9cMZH6hZOR99FuM7d1nzbiaE94UexTkabkCjQ94cIeg=="},"B-5":{"iv":"Cluc32/QNgrQojLJ","ct":"zINEFaZIRYjis5HFrQmbzq3gSw40g/CzqQqS4czwz0jeI+bJedLw0H4WRWMqjt95RbAIfPA6TA=="},"B-6":{"iv":"TiAqxRcCZosBlJ/Q","ct":"rBGOL5G+IpHxOkKRNyZ3UZ0XO07XahnTUKAQI14WOH/ViBqBy9vgYfC2mMFrAXgQucMcZQ=="}};
+const DATA = {"A-1":{"iv":"NBroSJrzM8eVnPei","ct":"qYeJLgjtX2RAewKPY408fyGJejLKtNP4X9t5h2kc0IKOyO5sNLtgChbuFfdUHn6gY92wbw=="},"A-2":{"iv":"LK82SEu245BVTIYC","ct":"2tVcgmZDQ+1joDhnsD2RenMBP2X8pJrfSuJ35stl5Ubn7jRB5KXrDjoNTA5nLna58Z9wYQ=="},"A-3":{"iv":"Ow0MHbMJnNX/l0P1","ct":"qw6mbQbi8GMVRGybBvwQFecyu50QEiAPWqVBXF4DeY+t7tFAQbnvrLL0KkmfFqDTEWXMqN5F0A=="},"A-4":{"iv":"p699Gkf66F3GKQU3","ct":"jCkbQxHDiwjoTkuQPgFl6hUFQDZc79qeKjeI/88VLlQqyXG4ZPZVk8e1I6Z+9dHqpQ=="},"A-5":{"iv":"UosjBVbXFFFqzy7J","ct":"Pyb3zd/kH5ay9LcSI3V4LVnK/klat82NhlAgYxD5J6FBVmq2AywGMnqahVNx6gMCfx48/Q=="},"A-6":{"iv":"gpM8b+6HiqLZfu5t","ct":"drSQJdfZn2AKRf8dFMCzQbyG4o4lhisyHOVYaHdmcn5x4r0VzWoWbjxjL74WAu8mOQ=="},"B-1":{"iv":"9tUOcS1vxDHQrvuK","ct":"w0ix+/8jUPNcwLxedRA0A3a1GScqm3Ud59bm5hhW0DkI14OXPxDguYUxYOGbLJnXmkq39g=="},"B-2":{"iv":"1Mjie9uqjcgi/mAC","ct":"AU4HSovPxwU1fAqhzDsdNSjhdmueMSh9rEk4ZsJ3iS6u3Jsv9Jz2Pcw3BgVXB8ZEdw=="},"B-3":{"iv":"mGoHFlocfI9YQZ0a","ct":"dPnZY2nqCk4v3UfO12UKhgpmGv/g+55qeewjrcBPws4YZt4ia4N9YoF6jNQ2RrYjdY8OwTe5tw=="},"B-4":{"iv":"m2bw8I6FIgz2mfz8","ct":"/Ib1ewjgpwFQmAitJ2/Oc6dO8v2Exq6sp9hZdD6zvLeFIABsA0ideudJqStKEOaQqqNC/A=="},"B-5":{"iv":"j2dCTHJ78QuE6M67","ct":"AOujLNvcOKNQUxeUEj0qFB+PAig6AvS18i7TMIBXNkjjrAJ2Pcfnk/69eTG1YiWrW9uDdZeWlQ=="},"B-6":{"iv":"+L4h+mkfcuYV5sip","ct":"ypH1RyI4XCwah0+1+ptSK4l7S//YjxcrPCgcSuCiu1F77AKOAPlvJdYiJ7ow/pdiRvndCg=="}};
 const ITER = 120000;
+const PASS = 'workshop-liar-2026';
 const $ = id => document.getElementById(id);
 const store = {
   get(k){try{return localStorage.getItem(k)}catch(e){return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 };
-const st = {group:store.get('lg_group'), num:Number(store.get('lg_num'))||null, round:Number(store.get('lg_round'))||null, card:null};
+const st = {group:store.get('lg_group'), confirmGroup:null, num:Number(store.get('lg_num'))||null, round:Number(store.get('lg_round'))||null, card:null};
 
 function b64(s){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
 async function decrypt(group, round, code){
@@ -184,17 +182,21 @@ async function decrypt(group, round, code){
 }
 
 function show(v){['v-setup','v-round','v-reveal'].forEach(x=>$(x).hidden = x!==v); window.scrollTo(0,0)}
-function meText(){return st.group+'그룹 '+st.num+'번'}
+function meText(){return (st.group?st.group+'조 ':'')+st.num+'번'}
+function parseGroup(v){
+  const t=v.replace(/[\uFF21-\uFF3A\uFF41-\uFF5A]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).toLowerCase().replace(/[\s조그룹팀]/g,'');
+  if(t==='a'||t==='ㅁ') return 'A';
+  if(t==='b'||t==='ㅠ') return 'B';
+  return null;
+}
 function roundText(r){return r===6?'예비 판':r+'판'}
 
 function buildSetup(){
-  const g=$('groups'); g.innerHTML='';
-  ['A','B'].forEach(x=>{const b=document.createElement('button');b.className='chip big';b.textContent=x+'그룹';b.setAttribute('aria-pressed',st.group===x);b.onclick=()=>{st.group=x;buildSetup()};g.appendChild(b)});
   const n=$('nums'); n.innerHTML='';
   for(let i=1;i<=7;i++){const b=document.createElement('button');b.className='chip';b.textContent=i;b.setAttribute('aria-pressed',st.num===i);b.setAttribute('aria-label',i+'번');b.onclick=()=>{st.num=i;buildSetup()};n.appendChild(b)}
-  const ok = !!(st.group && st.num);
+  const ok = !!st.num;
   $('go-setup').disabled = !ok;
-  $('go-setup').textContent = ok ? meText()+'으로 입장' : (st.group ? '번호를 고르세요' : (st.num ? '그룹을 고르세요' : '그룹과 번호를 고르세요'));
+  $('go-setup').textContent = ok ? meText()+'으로 입장' : '번호를 고르세요';
 }
 function buildRounds(){
   const r=$('rounds'); r.innerHTML='';
@@ -206,28 +208,33 @@ function toRound(){
   buildRounds(); show('v-round');
 }
 
-$('go-setup').onclick=()=>{store.set('lg_group',st.group);store.set('lg_num',String(st.num));toRound()};
+$('go-setup').onclick=()=>{store.set('lg_num',String(st.num));toRound()};
 $('change').onclick=()=>{buildSetup();show('v-setup')};
 $('code').addEventListener('input',e=>{
-  e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);
-  if(e.target.value.length===4 && st.round) $('code-form').requestSubmit();
+  st.confirmGroup=null;
+  if(parseGroup(e.target.value) && st.round) $('code-form').requestSubmit();
 });
 let busy=false;
 $('code-form').addEventListener('submit',async e=>{
   e.preventDefault(); if(busy) return;
-  const code=$('code').value;
+  const g=parseGroup($('code').value);
   if(!st.round){setMsg('판 번호를 먼저 고르세요.','err');return}
-  if(code.length!==4){setMsg('코드 4자리를 입력하세요.','err');return}
+  if(!g){setMsg('우리 조를 a 또는 b로 입력하세요.','err');return}
+  if(st.group && st.group!==g && st.confirmGroup!==g){
+    st.confirmGroup=g;
+    setMsg('지난 판에는 '+st.group+'조였어요. '+g+'조가 맞으면 아래 버튼을 한 번 더 누르세요.','err');
+    return;
+  }
   busy=true; $('open').disabled=true; setMsg('카드 섞는 중...','');
   try{
-    const d=await decrypt(st.group, st.round, code);
+    const d=await decrypt(g, st.round, PASS);
+    st.group=g; st.confirmGroup=null; store.set('lg_group',g);
     st.card={cat:d.c, liar:d.l===st.num, word:d.l===st.num?null:d.w};
     $('me-label2').textContent=meText();
     $('round-label').textContent=roundText(st.round);
     renderCard(); hide(); show('v-reveal');
   }catch(err){
-    setMsg('코드가 맞지 않아요. '+st.group+'그룹 · '+roundText(st.round)+' 코드가 맞는지 확인하세요.','err');
-    $('code').select();
+    setMsg('카드를 불러오지 못했어요. 새로고침 후 다시 시도하세요.','err');
   }finally{busy=false; $('open').disabled=false}
 });
 
@@ -256,7 +263,7 @@ $('next').onclick=()=>{
   toRound();
 };
 
-if(st.group && st.num){toRound()} else {buildSetup();show('v-setup')}
+if(st.num){toRound()} else {buildSetup();show('v-setup')}
 </script>
 </body>
 </html>
